@@ -21,22 +21,7 @@ app.get("/", function (req, res) {
 });
 
 
-//Check input Middleware
-const dnsMiddleware = (req, res, next) => {
-  const longUrl = req.body.url;
 
-  if (!validUrl.isUri(longUrl)) {
-    return res.status(400).send({ error: "invalid url" });
-  }
-  const hostname = new URL(longUrl).hostname;
-  dns.lookup(hostname, (err) => {
-    if (err) {
-      return res.json({ error: "invalid url" });
-    }
-  });
-  req.longUrl = longUrl;
-  next();
-};
 
 
 // API endpoints
@@ -53,6 +38,24 @@ app.get("/api/shorturl/:short_url?", async (req, res) => {
 });
 
 
+
+//Check input Middleware
+const dnsMiddleware = (req, res, next) => {
+  const longUrl = req.body.url;
+
+  if (!validUrl.isUri(longUrl)) {
+    return res.status(400).send({ error1: "invalid url" });
+  }
+  const hostname = new URL(longUrl).hostname;
+  console.log(hostname)
+  dns.lookup(hostname, (err) => {
+    if (err) {
+      return res.status(400).send({ error2: "invalid url" });
+    }
+    req.longUrl = longUrl;
+    next();
+  });
+};
 
 app.post("/api/shorturl", dnsMiddleware, async (req, res) => {
   const longUrl = req.longUrl;
